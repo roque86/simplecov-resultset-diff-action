@@ -1,6 +1,6 @@
 name: 'SimpleCov resultset diff'
 description: 'Creates a comment in the pull-request comparing two SimpleCov resultset files.'
-author: Kazuki Nishikawa
+author: DFE-Digital
 inputs:
   base-resultset-path:
     description: 'SimpleCov generated "resultset.json" file path from the base branch'
