@@ -140,7 +140,7 @@ ${content}
       issue_number: pullRequestId,
       body: message
     })
-  } catch (error: any) {
+  } catch (error) {
     core.setFailed(error.message)
   }
 }
