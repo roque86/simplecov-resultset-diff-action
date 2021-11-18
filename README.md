@@ -9,7 +9,7 @@ Creates a comment inside your Pull-Request with the difference between two Simpl
 To use this Github action, in your steps you may have:
 
 ```yml
-uses: kzkn/simplecov-resultset-diff-action@v1
+uses: DFE-Digital/simplecov-resultset-diff-action@v1
 with:
   base-resultset-path: '/path/to/my/.resultset.json'
   head-resultset-path: '/path/to/my/.resultset.json'
