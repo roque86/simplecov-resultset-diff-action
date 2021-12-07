@@ -1548,7 +1548,7 @@ function run() {
                 ]);
             }
             const message = `<details>
-<summary>Coverage difference</summary>
+<summary><h2>Coverage difference</h2></summary>
 
 ${content}
 </details>
