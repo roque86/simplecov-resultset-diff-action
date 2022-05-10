@@ -45,6 +45,7 @@ function linesCoverage(coverage: LineCoverage): number {
 }
 
 function branchesCoverages(coverage: BranchCoverage): number {
+  if(!coverage) return 100;
   const conditions = Object.keys(coverage)
   if (conditions.length === 0) {
     return 100
@@ -69,7 +70,7 @@ export class Coverage {
   files: FileCoverage[]
 
   constructor(resultset: ResultSet) {
-    const coverages = resultset['RSpec']['coverage']
+    const coverages = resultset[Object.keys(resultset)[0]]['coverage']
     this.files = []
     for (const filename of Object.keys(coverages)) {
       const coverage = coverages[filename]
