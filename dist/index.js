@@ -1557,7 +1557,7 @@ ${content}
              * Publish a comment in the PR with the diff result.
              */
             const octokit = github.getOctokit(core.getInput('token'));
-            const pullRequestId = github.context.issue.number;
+            const pullRequestId = Number(core.getInput('pr-id')) || github.context.issue.number;
             if (!pullRequestId) {
                 core.warning('Cannot find the PR id.');
                 core.info(message);
@@ -1571,6 +1571,7 @@ ${content}
             });
         }
         catch (error) {
+            core.warning(error.stack);
             core.setFailed(error.message);
         }
     });
@@ -9593,6 +9594,8 @@ function linesCoverage(coverage) {
     return floor((covered / rows) * 100, 2);
 }
 function branchesCoverages(coverage) {
+    if (!coverage)
+        return 100;
     const conditions = Object.keys(coverage);
     if (conditions.length === 0) {
         return 100;
@@ -9613,7 +9616,7 @@ function branchesCoverages(coverage) {
 }
 class Coverage {
     constructor(resultset) {
-        const coverages = resultset['RSpec']['coverage'];
+        const coverages = resultset[Object.keys(resultset)[0]]['coverage'];
         this.files = [];
         for (const filename of Object.keys(coverages)) {
             const coverage = coverages[filename];

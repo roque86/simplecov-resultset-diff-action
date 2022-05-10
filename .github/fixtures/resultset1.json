@@ -1,5 +1,5 @@
 {
-  "RSpec": {
+  "rspec_ci_node_0, rspec_ci_node_1, rspec_ci_node_2, rspec_ci_node_3, rspec_ci_node_4, rspec_ci_node_5": {
     "coverage": {
       "foo.rb": {
         "lines": [

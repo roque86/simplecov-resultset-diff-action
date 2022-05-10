@@ -127,7 +127,7 @@ ${content}
      */
     const octokit = github.getOctokit(core.getInput('token'))
 
-    const pullRequestId = github.context.issue.number
+    const pullRequestId = Number(core.getInput('pr-id')) || github.context.issue.number
     if (!pullRequestId) {
       core.warning('Cannot find the PR id.')
       core.info(message)
@@ -141,6 +141,7 @@ ${content}
       body: message
     })
   } catch (error) {
+    core.warning(error.stack)
     core.setFailed(error.message)
   }
 }

@@ -1,6 +1,6 @@
 name: 'SimpleCov resultset diff'
 description: 'Creates a comment in the pull-request comparing two SimpleCov resultset files.'
-author: DFE-Digital
+author: RRA
 inputs:
   base-resultset-path:
     description: 'SimpleCov generated "resultset.json" file path from the base branch'
@@ -8,6 +8,9 @@ inputs:
   head-resultset-path:
     description: 'SimpleCov generated "resultset.json" file path from the head branch'
     required: true
+  pr-id:
+    description: 'Github PR id'
+    required: false
   token:
     description: 'Github generated token'
     required: true
