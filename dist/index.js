@@ -1515,6 +1515,18 @@ function formatDiff(diff) {
         formatDiffItem(diff.branches)
     ];
 }
+function findPreviousComment(octokit, pullRequestId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const parameters = {
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: pullRequestId
+        };
+        const comments = yield octokit.paginate(octokit.issues.listComments, parameters);
+        comments.reverse();
+        return comments.find((comment) => comment.body.includes('Coverage'));
+    });
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -1553,10 +1565,6 @@ function run() {
 ${content}
 </details>
 `;
-            yield core.summary
-                .addHeading('Coverage difference')
-                .addRaw(content)
-                .write();
             /**
              * Publish a comment in the PR with the diff result.
              */
@@ -1567,12 +1575,24 @@ ${content}
                 core.info(message);
                 return;
             }
-            yield octokit.issues.createComment({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                issue_number: pullRequestId,
-                body: message
-            });
+            const found_comment = yield findPreviousComment(octokit, pullRequestId);
+            if (found_comment) {
+                core.info(`Using commentId: ${found_comment.id}`);
+                yield octokit.issues.updateComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    comment_id: found_comment.id,
+                    body: message
+                });
+            }
+            else {
+                yield octokit.issues.createComment({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: pullRequestId,
+                    body: message
+                });
+            }
         }
         catch (error) {
             core.warning(error.stack);

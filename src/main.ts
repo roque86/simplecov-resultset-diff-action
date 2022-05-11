@@ -9,6 +9,7 @@ import {
   getCoverageDiff,
   FileCoverageDiff
 } from './simplecov'
+import {GitHub} from "@actions/github/lib/utils";
 
 const WORKSPACE: string = process.env.GITHUB_WORKSPACE!
 
@@ -78,6 +79,21 @@ function formatDiff(diff: FileCoverageDiff): [string, string, string] {
   ]
 }
 
+async function findPreviousComment(octokit: InstanceType<typeof GitHub>, pullRequestId: number) {
+  const parameters = {
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: pullRequestId
+  }
+
+  const comments = await octokit.paginate(
+    octokit.issues.listComments,
+    parameters
+  )
+  comments.reverse()
+  return comments.find((comment: any) => comment.body.includes('Coverage'))
+}
+
 async function run(): Promise<void> {
   try {
     const resultsetPaths = {
@@ -121,10 +137,6 @@ async function run(): Promise<void> {
 ${content}
 </details>
 `
-    await core.summary
-        .addHeading('Coverage difference')
-        .addRaw(content)
-        .write()
     /**
      * Publish a comment in the PR with the diff result.
      */
@@ -137,12 +149,23 @@ ${content}
       return
     }
 
-    await octokit.issues.createComment({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      issue_number: pullRequestId,
-      body: message
-    })
+    const found_comment = await findPreviousComment(octokit, pullRequestId)
+    if (found_comment) {
+      core.info(`Using commentId: ${found_comment.id}`)
+      await octokit.issues.updateComment({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        comment_id: found_comment.id,
+        body: message
+      })
+    } else {
+      await octokit.issues.createComment({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: pullRequestId,
+        body: message
+      })
+    }
   } catch (error) {
     core.warning(error.stack)
     core.setFailed(error.message)
